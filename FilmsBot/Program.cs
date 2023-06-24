@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FilmsAPI.Models.DTO;
@@ -9,64 +11,60 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-
 class Program
 {
-    static ITelegramBotClient
-        bot = new TelegramBotClient(""); // token
-    
-    
-    public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
-        CancellationToken cancellationToken)
+    static ITelegramBotClient bot = new TelegramBotClient(""); // Токен бота
+
+public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+{
+    var message = update.Message;
+    if (update.Type == UpdateType.Message)
     {
-        var message = update.Message;
-        if (update.Type == UpdateType.Message)
+        var name = update.Message.From.FirstName;
+        if (message.Text.ToLower() == "/start")
         {
-            
-            var name = update.Message.From.FirstName;
-            if (message.Text.ToLower() == "/start")
-            {
-                await botClient.SendTextMessageAsync(message.Chat,
-                    $"Привіт, {name}!\n\n/menu - відкрити головне меню 🎦");
-                return;
-            }
-
-            await MenuButton(botClient, update, cancellationToken);
+            await botClient.SendTextMessageAsync(message.Chat, $"Привіт, {name}!\n\n/menu - відкрити головне меню 🎦");
+            return;
         }
-        else if (update.Type == UpdateType.CallbackQuery)
+
+        await MenuButton(botClient, update, cancellationToken);
+    }
+    else if (update.Type == UpdateType.CallbackQuery)
+    {
+        var callbackQuery = update.CallbackQuery;
+        if (callbackQuery.Data == "films_in_theaters")
         {
-            var callbackQuery = update.CallbackQuery;
-            if (callbackQuery.Data == "films_in_theaters")
+            string baseUrl = "http://localhost:5222/api/Movie/";
+
+            using (HttpClient client = new HttpClient())
             {
-                string baseUrl = "http://localhost:5222/api/Movie/";
-
-                using (HttpClient client = new HttpClient())
+                HttpResponseMessage response = await client.GetAsync(baseUrl);
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage response = await client.GetAsync(baseUrl);
-                    if (response.IsSuccessStatusCode)
+                    var films = await response.Content.ReadAsAsync<MovieDTO[]>();
+                    string result = "💥 Список фільмів:\n\n";
+                    foreach (var film in films)
                     {
-                        var films = await response.Content.ReadAsAsync<MovieDTO[]>();
-                        string result = "💥 Список фільмів:\n\n";
-                        foreach (var film in films)
-                        {
-                            result += $"🎥 Назва: {film.Title}\n";
-                            result += $"🔥 Опис: {film.Description}\n\n";
-                        }
-
-                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, result);
+                        result += $"🎥 Назва: {film.Title}\n";
+                        result += $"🔥 Опис: {film.Description}\n\n";
                     }
+
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, result);
                 }
             }
+        }
+        else if (callbackQuery.Data == "delete_movie_by_id")
+        {
+            await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Будь ласка, введіть ID:");
+        }
+    }
+    else if (update.Type == UpdateType.Message && !string.IsNullOrEmpty(update.Message.Text))
+    {
+        var text = update.Message.Text;
 
-            if (callbackQuery.Data == "delete_movie_by_id")
-            {
-                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Будь ласка, введіть ID:");
-            }
-
-// Wait for the user's response
-            var userResponse = await botClient.GetUpdatesAsync();
-            var movieId = userResponse.FirstOrDefault()?.Message.Text;
-
+        if (text.StartsWith("/delete"))
+        {
+            var movieId = text.Substring(7).Trim();
             if (int.TryParse(movieId, out int id))
             {
                 string baseUrl = "http://localhost:5222/api/Movie/";
@@ -76,32 +74,33 @@ class Program
                     HttpResponseMessage deleteResponse = await client.DeleteAsync(baseUrl + id);
                     if (deleteResponse.IsSuccessStatusCode)
                     {
-                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Фільм успішно видалено.");
+                        await botClient.SendTextMessageAsync(update.Message.Chat, "Фільм успішно видалено.");
                     }
                     else if (deleteResponse.StatusCode == HttpStatusCode.NotFound)
                     {
-                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Фільм не знайдено.");
+                        await botClient.SendTextMessageAsync(update.Message.Chat, "Фільм не знайдено.");
                         Console.WriteLine("Фільм не знайдено.");
                     }
                 }
             }
             else
             {
-                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Введено некоректний ID фільму.");
+                await botClient.SendTextMessageAsync(update.Message.Chat, "Введено некоректний ID фільму.");
                 Console.WriteLine("Введено некоректний ID фільму.");
             }
         }
     }
+}
 
-    public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
-        CancellationToken cancellationToken)
+
+
+    public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
     {
         Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
         // Console.WriteLine();
     }
 
-    public static async Task MenuButton(ITelegramBotClient botClient, Update update,
-        CancellationToken cancellationToken)
+    public static async Task MenuButton(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         if (update.Type == UpdateType.Message)
         {
@@ -120,31 +119,23 @@ class Program
                     }
                 });
 
-                await botClient.SendTextMessageAsync(message.Chat, "Оберіть, що вам потрібно:)",
-                    replyMarkup: inlineKeyboardMarkup);
+                await botClient.SendTextMessageAsync(message.Chat, "Оберіть, що вам потрібно:)", replyMarkup: inlineKeyboardMarkup);
             }
         }
     }
 
-
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         // Console.WriteLine($"Let's go {bot.GetMeAsync().Result.FirstName}!");
-        Update update = new Update();
         var cts = new CancellationTokenSource();
         var cancellationToken = cts.Token;
 
         var receiverOptions = new ReceiverOptions
         {
-            AllowedUpdates = { }, // отримати всі типи оновлень
+            AllowedUpdates = { }, // Отримати всі типи оновлень
         };
 
-        bot.StartReceiving(
-            HandleUpdateAsync,
-            HandleErrorAsync,
-            receiverOptions,
-            cancellationToken
-        );
+        bot.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken);
         Console.ReadLine();
     }
 }
