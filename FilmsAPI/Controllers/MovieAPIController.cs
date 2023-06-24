@@ -20,7 +20,7 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
-    public async Task<ActionResult> GetMovie(int id)
+    public ActionResult GetMovie(int id)
     {
         if (id == 0)
             return BadRequest();
@@ -33,7 +33,7 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetMovies()
+    public ActionResult GetMovies()
     {
         var films = _db.Movies.ToList();
         var result = films.Select(movie => _mapper.Map<MovieDTO>(movie)).ToList();
@@ -44,6 +44,46 @@ public class MovieAPIController : Controller
         }
 
         return Ok(result);
+    }
 
+
+    [HttpPost]
+    public ActionResult CreateMovie([FromBody] CreateMovieDTO createDto)
+    {
+        if (createDto == null)
+            return BadRequest(createDto);
+        
+        
+        if (_db.Movies.FirstOrDefault(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
+        {
+            ModelState.AddModelError("ErrorMessages", "Film already exists!");
+            return BadRequest(ModelState);
+        }
+        
+        Movie movie = _mapper.Map<Movie>(createDto);
+        _db.Movies.Add(movie);
+        _db.SaveChanges();
+
+        return Ok(movie);
+    }
+
+    [HttpDelete("{id:int}", Name = "DeleteMovie")]
+    public ActionResult DeleteVilla(int id)
+    {
+        if (id == 0)
+        {
+            return BadRequest();
+        }
+        
+        var movie = _db.Movies.FirstOrDefault(u => u.Id == id);
+        if (movie == null)
+        {
+            return NotFound();
+        }
+
+        _db.Movies.Remove(movie);
+        _db.SaveChanges();
+
+        return Ok(movie);
     }
 }
