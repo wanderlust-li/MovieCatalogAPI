@@ -68,7 +68,7 @@ public class MovieAPIController : Controller
     }
 
     [HttpDelete("{id:int}", Name = "DeleteMovie")]
-    public ActionResult DeleteVilla(int id)
+    public ActionResult DeleteMovie(int id)
     {
         if (id == 0)
         {

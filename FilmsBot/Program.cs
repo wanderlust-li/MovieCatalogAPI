@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FilmsAPI.Models.DTO;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -11,30 +13,83 @@ using Telegram.Bot.Types.ReplyMarkups;
 class Program
 {
     static ITelegramBotClient
-        bot = new TelegramBotClient("6271314742:AAHB9QjBuQOAjzi0VoCj71DNNgqarYy9SfE"); // token
-
+        bot = new TelegramBotClient(""); // token
+    
+    
     public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
-
+        var message = update.Message;
         if (update.Type == UpdateType.Message)
         {
-            var message = update.Message;
+            
             var name = update.Message.From.FirstName;
             if (message.Text.ToLower() == "/start")
             {
-                Console.WriteLine(
-                    $"\nid_user = {update.Id} \t name_user = {update.Message.From.Username} " +
-                    $"\t lang_user = {update.Message.From.LanguageCode}\n");
-
                 await botClient.SendTextMessageAsync(message.Chat,
-                    $"Привіт, {name}!\n\n/menu - подивитись всі фільми 🎦");
+                    $"Привіт, {name}!\n\n/menu - відкрити головне меню 🎦");
                 return;
             }
 
-
             await MenuButton(botClient, update, cancellationToken);
+        }
+        else if (update.Type == UpdateType.CallbackQuery)
+        {
+            var callbackQuery = update.CallbackQuery;
+            if (callbackQuery.Data == "films_in_theaters")
+            {
+                string baseUrl = "http://localhost:5222/api/Movie/";
+
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.GetAsync(baseUrl);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var films = await response.Content.ReadAsAsync<MovieDTO[]>();
+                        string result = "💥 Список фільмів:\n\n";
+                        foreach (var film in films)
+                        {
+                            result += $"🎥 Назва: {film.Title}\n";
+                            result += $"🔥 Опис: {film.Description}\n\n";
+                        }
+
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, result);
+                    }
+                }
+            }
+
+            if (callbackQuery.Data == "delete_movie_by_id")
+            {
+                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Будь ласка, введіть ID:");
+            }
+
+// Wait for the user's response
+            var userResponse = await botClient.GetUpdatesAsync();
+            var movieId = userResponse.FirstOrDefault()?.Message.Text;
+
+            if (int.TryParse(movieId, out int id))
+            {
+                string baseUrl = "http://localhost:5222/api/Movie/";
+
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage deleteResponse = await client.DeleteAsync(baseUrl + id);
+                    if (deleteResponse.IsSuccessStatusCode)
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Фільм успішно видалено.");
+                    }
+                    else if (deleteResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Фільм не знайдено.");
+                        Console.WriteLine("Фільм не знайдено.");
+                    }
+                }
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Введено некоректний ID фільму.");
+                Console.WriteLine("Введено некоректний ID фільму.");
+            }
         }
     }
 
@@ -42,6 +97,7 @@ class Program
         CancellationToken cancellationToken)
     {
         Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
+        // Console.WriteLine();
     }
 
     public static async Task MenuButton(ITelegramBotClient botClient, Update update,
@@ -50,46 +106,22 @@ class Program
         if (update.Type == UpdateType.Message)
         {
             var message = update.Message;
-            var name = update.Message.From.FirstName;
-
-            if (message == null || message.Type != MessageType.Text) return; // перевіряємо на null
-
             if (message.Text != null && message.Text.ToLower() == "/menu")
             {
-                InlineKeyboardMarkup replyKeyboardMarkup = new(new[]
+                var inlineKeyboardMarkup = new InlineKeyboardMarkup(new[]
                 {
-                    new InlineKeyboardButton[]
+                    new[]
                     {
-                        InlineKeyboardButton.WithUrl(
-                            text: "Фільми в прокаті",
-                            url: "https://en.wikipedia.org/wiki/Main_Page"
-                        )
+                        InlineKeyboardButton.WithCallbackData("Фільми в прокаті", "films_in_theaters")
                     },
-                    new InlineKeyboardButton[]
+                    new[]
                     {
-                        InlineKeyboardButton.WithUrl(
-                            text: "Додати фільм",
-                            url: "https://en.wikipedia.org/wiki/Main_Page"
-                        )
-                    },
-                    new InlineKeyboardButton[]
-                    {
-                        InlineKeyboardButton.WithUrl(
-                            text: "Видалити фільм",
-                            url: "https://en.wikipedia.org/wiki/Main_Page"
-                        )
-                    },
-                    new InlineKeyboardButton[]
-                    {
-                        InlineKeyboardButton.WithUrl(
-                            text: "Подивитись всі фільми",
-                            url: "https://en.wikipedia.org/wiki/Main_Page"
-                        )
+                        InlineKeyboardButton.WithCallbackData("Видалити фільм по ID", "delete_movie_by_id")
                     }
                 });
 
                 await botClient.SendTextMessageAsync(message.Chat, "Оберіть, що вам потрібно:)",
-                    replyMarkup: replyKeyboardMarkup);
+                    replyMarkup: inlineKeyboardMarkup);
             }
         }
     }
@@ -97,7 +129,7 @@ class Program
 
     static void Main(string[] args)
     {
-        Console.WriteLine($"Let's go {bot.GetMeAsync().Result.FirstName}!");
+        // Console.WriteLine($"Let's go {bot.GetMeAsync().Result.FirstName}!");
         Update update = new Update();
         var cts = new CancellationTokenSource();
         var cancellationToken = cts.Token;
