@@ -67,6 +67,7 @@ public class MovieAPIController : Controller
         return Ok(movie);
     }
 
+    // [HttpGet("{id:int}", Name = "DeleteMovie")]
     [HttpDelete("{id:int}", Name = "DeleteMovie")]
     public ActionResult DeleteMovie(int id)
     {
