@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FilmsAPI.Models.DTO;
+using MovieAPI.Models.DTO;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;

@@ -3,7 +3,7 @@
   <component name="EfCoreDialogsState">
     <option name="keyValueStorage">
       <map>
-        <entry key="Common:801dd4a5-be41-4892-a6d4-5aea90d35340:dbContext" value="FilmsAPI.Data.ApplicationDbContext" />
+        <entry key="Common:801dd4a5-be41-4892-a6d4-5aea90d35340:dbContext" value="MovieAPI.Data.ApplicationDbContext" />
         <entry key="Common:buildConfiguration" value="Debug" />
         <entry key="Common:noBuild" value="false" />
         <entry key="Common:outputFolder" value="Migrations" />

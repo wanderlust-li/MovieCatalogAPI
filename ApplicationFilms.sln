@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilmsAPI", "FilmsAPI\FilmsAPI.csproj", "{801DD4A5-BE41-4892-A6D4-5AEA90D35340}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieAPI", "MovieAPI\MovieAPI.csproj", "{801DD4A5-BE41-4892-A6D4-5AEA90D35340}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilmsBot", "FilmsBot\FilmsBot.csproj", "{4DDB91EA-6C3B-444A-884B-0FDAB17554CA}"
 EndProject

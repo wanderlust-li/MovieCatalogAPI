@@ -1,0 +1,7 @@
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.csproj.AssemblyReference.cache
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.GeneratedMSBuildEditorConfig.editorconfig
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.AssemblyInfoInputs.cache
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.AssemblyInfo.cs
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.csproj.CoreCompileInputs.cache
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.MvcApplicationPartsAssemblyInfo.cs
+D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.MvcApplicationPartsAssemblyInfo.cache
