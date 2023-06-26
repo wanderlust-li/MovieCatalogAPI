@@ -1,6 +1,8 @@
-﻿namespace FilmsAPI.Repository.IRepository;
+﻿using FilmsAPI.Models;
 
-public interface IMovieRepository
+namespace FilmsAPI.Repository.IRepository;
+
+public interface IMovieRepository: IRepository<Movie>
 {
-    
+    Task<Movie> UpdateAsync(Movie entity);
 }

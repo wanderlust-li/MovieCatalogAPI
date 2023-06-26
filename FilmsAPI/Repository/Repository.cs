@@ -17,28 +17,44 @@ public class Repository<T>: IRepository<T> where T: class
     }
     
     
-    public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
+    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
     {
-        throw new NotImplementedException();
+        IQueryable<T> query = dbSet;
+
+        if (filter != null)
+            query = query.Where(filter);
+        
+
+        return await query.ToListAsync();
     }
 
-    public Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true)
+    public async Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true)
     {
-        throw new NotImplementedException();
+        IQueryable<T> query = dbSet;
+
+        if (!tracked)
+            query = query.AsNoTracking();
+        
+        if (filter != null)
+            query = query.Where(filter); 
+        
+        return await query.FirstOrDefaultAsync();
     }
 
-    public Task CreateAsync(T entity)
+    public async Task CreateAsync(T entity)
     {
-        throw new NotImplementedException();
+        await dbSet.AddAsync(entity);
+        await SaveAsync();
     }
 
-    public Task RemoveAsync(T entity)
+    public async Task RemoveAsync(T entity)
     {
-        throw new NotImplementedException();
+        dbSet.Remove(entity);
+        await SaveAsync();
     }
 
-    public Task SaveAsync()
+    public async Task SaveAsync()
     {
-        throw new NotImplementedException();
+        await _db.SaveChangesAsync();
     }
 }
