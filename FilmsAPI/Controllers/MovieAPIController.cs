@@ -2,6 +2,7 @@
 using FilmsAPI.Data;
 using FilmsAPI.Models;
 using FilmsAPI.Models.DTO;
+using FilmsAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilmsAPI.Controllers;
@@ -10,21 +11,21 @@ namespace FilmsAPI.Controllers;
 [ApiController]
 public class MovieAPIController : Controller
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IMovieRepository _db;
     private readonly IMapper _mapper;
 
-    public MovieAPIController(ApplicationDbContext db, IMapper mapper)
+    public MovieAPIController(IMovieRepository db, IMapper mapper)
     {
         _db = db;
         _mapper = mapper;
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
-    public ActionResult GetMovie(int id)
+    public async Task<ActionResult> GetMovie(int id)
     {
         if (id == 0)
             return BadRequest();
-        var film = _db.Movies.FirstOrDefault(u => u.Id == id);
+        var film = await _db.GetAsync(u => u.Id == id);
         if (film == null)
             return NotFound();
 
@@ -33,9 +34,10 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet]
-    public ActionResult GetMovies()
+    public async Task<ActionResult> GetMovies()
     {
-        var films = _db.Movies.ToList();
+        // var films = _db.Movies.ToList();
+        IEnumerable<Movie> films = await _db.GetAllAsync();
         var result = films.Select(movie => _mapper.Map<MovieDTO>(movie)).ToList();
 
         if (result == null)
@@ -48,42 +50,39 @@ public class MovieAPIController : Controller
 
 
     [HttpPost]
-    public ActionResult CreateMovie([FromBody] CreateMovieDTO createDto)
+    public async Task<ActionResult> CreateMovie([FromBody] CreateMovieDTO createDto)
     {
         if (createDto == null)
             return BadRequest(createDto);
         
         
-        if (_db.Movies.FirstOrDefault(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
+        if (_db.GetAsync(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
         {
             ModelState.AddModelError("ErrorMessages", "Film already exists!");
             return BadRequest(ModelState);
         }
         
         Movie movie = _mapper.Map<Movie>(createDto);
-        _db.Movies.Add(movie);
-        _db.SaveChanges();
+        await _db.CreateAsync(movie);
 
         return Ok(movie);
     }
-
-    // [HttpGet("{id:int}", Name = "DeleteMovie")]
+    
     [HttpDelete("{id:int}", Name = "DeleteMovie")]
-    public ActionResult DeleteMovie(int id)
+    public async Task<ActionResult> DeleteMovie(int id)
     {
         if (id == 0)
         {
             return BadRequest();
         }
         
-        var movie = _db.Movies.FirstOrDefault(u => u.Id == id);
+        var movie = await _db.GetAsync(u => u.Id == id);
         if (movie == null)
         {
             return NotFound();
         }
 
-        _db.Movies.Remove(movie);
-        _db.SaveChanges();
+        _db.RemoveAsync(movie);
 
         return Ok(movie);
     }
