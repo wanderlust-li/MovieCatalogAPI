@@ -32,64 +32,6 @@ class Program
         }
 
         await MenuButton(botClient, update, cancellationToken);
-
-        var text = update.Message.Text;
-        if (stage.ContainsKey(update.Message.Chat.Id))
-        {
-            if (stage[message.Chat.Id] == "deleting")
-            {
-                string id_from_message = new String(text.Where(Char.IsDigit).ToArray());
-                if (int.TryParse(id_from_message, out int id))
-                {
-                    string baseUrl = "http://localhost:5222/api/Movie/";
-                    using (HttpClient client = new HttpClient())
-                    {
-                        HttpResponseMessage deleteResponse = await client.DeleteAsync(baseUrl + id);
-                        if (deleteResponse.IsSuccessStatusCode)
-                            await botClient.SendTextMessageAsync(update.Message.Chat, "Фільм успішно видалено.");
-                        else if (deleteResponse.StatusCode == HttpStatusCode.NotFound)
-                            await botClient.SendTextMessageAsync(update.Message.Chat, "Фільм не знайдено.");
-                    }
-
-                    // Видалення стану "deleting" після успішного видалення фільму
-                    stage.Remove(message.Chat.Id);
-                }
-            }
-        }
-    }
-    else if (update.Type == UpdateType.CallbackQuery)
-    {
-        var callbackQuery = update.CallbackQuery;
-        if (callbackQuery.Data == "films_in_theaters")
-        {
-            string baseUrl = "http://localhost:5222/api/Movie/";
-            using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage response = await client.GetAsync(baseUrl);
-                if (response.IsSuccessStatusCode)
-                {
-                    var films = await response.Content.ReadAsAsync<MovieDTO[]>();
-                    string result = "💥 Список фільмів:\n\n";
-                    foreach (var film in films)
-                    {
-                        result += $"🎥 Назва: {film.Title}\n";
-                        result += $"🔥 Опис: {film.Description}\n\n";
-                    }
-
-                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, result);
-                }
-            }
-        }
-
-        if (callbackQuery.Data == "delete_movie_by_id")
-        {
-            // Перевірка, чи користувач вже ввів ID фільму
-            if (!stage.ContainsKey(callbackQuery.Message.Chat.Id))
-            {
-                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Будь ласка, введіть ID:");
-                stage[callbackQuery.Message.Chat.Id] = "deleting";
-            }
-        }
     }
 }
     
@@ -112,16 +54,13 @@ class Program
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Фільми в прокаті", "films_in_theaters")
+                        InlineKeyboardButton.WithCallbackData("Випадковий фільм", "random_films")
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Видалити фільм по ID", "delete_movie_by_id")
+                        InlineKeyboardButton.WithCallbackData("Додати фільм до списку", "add_new_films")
                     },
-                    //new[]
-                    //{
-                    //    InlineKeyboardButton.WithCallbackData("Додати фільм", "add_films")
-                    //}
+                    
                 });
 
                 await botClient.SendTextMessageAsync(message.Chat, "Оберіть, що вам потрібно:)",
