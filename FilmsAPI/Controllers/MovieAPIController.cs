@@ -82,11 +82,22 @@ public class MovieAPIController : Controller
             return NotFound();
         }
 
-        _db.RemoveAsync(movie);
+        await _db.RemoveAsync(movie);
 
         return Ok(movie);
     }
-    
-    
-    // put method
+
+    [HttpPut("{id:int}", Name = "UpdateMovie")]
+    public async Task<ActionResult> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateDTO)
+    {
+        if (updateDTO == null || updateDTO.Id != id)
+        {
+            return BadRequest();
+        }
+
+        Movie movie = _mapper.Map<Movie>(updateDTO);
+        await _db.UpdateAsync(movie);
+
+        return Ok(movie);
+    }
 }

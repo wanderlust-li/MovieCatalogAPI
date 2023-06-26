@@ -12,5 +12,6 @@ public class MappingConfig : Profile
         CreateMap<MovieDTO, Movie>();
         
         CreateMap<Movie, CreateMovieDTO>().ReverseMap();
+        CreateMap<Movie, UpdateMovieDTO>().ReverseMap();
     }
 }

@@ -10,7 +10,7 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
 
     public MovieRepository(ApplicationDbContext db) : base(db)
     {
-        
+        _db = db;
     }
 
     public async Task<Movie> UpdateAsync(Movie entity)
