@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using MovieAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using MovieAPI.Models;
@@ -11,6 +12,7 @@ namespace MovieAPI.Controllers;
 [ApiController]
 public class MovieAPIController : Controller
 {
+    protected APIResponse _response;
     private readonly IMovieRepository _db;
     private readonly IMapper _mapper;
 
@@ -18,19 +20,39 @@ public class MovieAPIController : Controller
     {
         _db = db;
         _mapper = mapper;
+        this._response = new();
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
-    public async Task<ActionResult> GetMovie(int id)
+    public async Task<ActionResult<APIResponse>> GetMovie(int id)
     {
-        if (id == 0)
-            return BadRequest();
-        var film = await _db.GetAsync(u => u.Id == id);
-        if (film == null)
-            return NotFound();
+        try
+        {
+            if (id == 0)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest(_response);
+            }
 
-        var result = _mapper.Map<MovieDTO>(film);
-        return Ok(result);
+            var film = await _db.GetAsync(u => u.Id == id);
+            if (film == null)
+            {
+                _response.StatusCode = HttpStatusCode.NotFound;
+                return NotFound(_response);
+            }
+
+            _response.Result = _mapper.Map<MovieDTO>(film);
+            _response.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string>() { ex.ToString() };
+        }
+
+        return _response;
     }
 
     [HttpGet]
@@ -56,7 +78,7 @@ public class MovieAPIController : Controller
             return BadRequest(createDto);
         
         
-        if (_db.GetAsync(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
+        if (await _db.GetAsync(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
         {
             ModelState.AddModelError("ErrorMessages", "Film already exists!");
             return BadRequest(ModelState);
@@ -87,17 +109,17 @@ public class MovieAPIController : Controller
         return Ok(movie);
     }
 
-    [HttpPut("{id:int}", Name = "UpdateMovie")]
-    public async Task<ActionResult> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateDTO)
-    {
-        if (updateDTO == null || updateDTO.Id != id)
-        {
-            return BadRequest();
-        }
-
-        Movie movie = _mapper.Map<Movie>(updateDTO);
-        await _db.UpdateAsync(movie);
-
-        return Ok(movie);
-    }
+    // [HttpPut("{id:int}", Name = "UpdateMovie")]
+    // public async Task<ActionResult> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateDTO)
+    // {
+    //     if (updateDTO == null || updateDTO.Id != id)
+    //     {
+    //         return BadRequest();
+    //     }
+    //
+    //     Movie movie = _mapper.Map<Movie>(updateDTO);
+    //     await _db.UpdateAsync(movie);
+    //
+    //     return Ok(movie);
+    // }
 }
