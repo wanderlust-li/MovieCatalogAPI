@@ -56,18 +56,32 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetMovies()
+    public async Task<ActionResult<APIResponse>> GetMovies()
     {
-        // var films = _db.Movies.ToList();
-        IEnumerable<Movie> films = await _db.GetAllAsync();
-        var result = films.Select(movie => _mapper.Map<MovieDTO>(movie)).ToList();
-
-        if (result == null)
+        try
         {
-            return NotFound();
+            IEnumerable<Movie> films = await _db.GetAllAsync();
+
+            if (films == null)
+            {
+                _response.StatusCode = HttpStatusCode.NotFound;
+                return NotFound(_response);
+            }
+            
+            _response.Result = _mapper.Map<List<MovieDTO>>(films);
+            _response.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_response);;
+        }
+        
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string>() { ex.ToString() };
         }
 
-        return Ok(result);
+        return _response;
+        
     }
 
 
