@@ -86,22 +86,37 @@ public class MovieAPIController : Controller
 
 
     [HttpPost]
-    public async Task<ActionResult> CreateMovie([FromBody] CreateMovieDTO createDto)
+    public async Task<ActionResult<APIResponse>> CreateMovie([FromBody] CreateMovieDTO createDto)
     {
-        if (createDto == null)
-            return BadRequest(createDto);
-        
-        
-        if (await _db.GetAsync(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
+        try
         {
-            ModelState.AddModelError("ErrorMessages", "Film already exists!");
-            return BadRequest(ModelState);
-        }
-        
-        Movie movie = _mapper.Map<Movie>(createDto);
-        await _db.CreateAsync(movie);
+            if (createDto == null)
+            {
+                return BadRequest(createDto);
+            }
 
-        return Ok(movie);
+            if (await _db.GetAsync(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
+            {
+                ModelState.AddModelError("ErrorMessages", "Film already exists!");
+
+                return BadRequest(ModelState);
+            }
+
+            Movie movie = _mapper.Map<Movie>(createDto);
+            await _db.CreateAsync(movie);
+
+            _response.Result = _mapper.Map<List<MovieDTO>>(movie);
+            _response.StatusCode = HttpStatusCode.Created;
+            return CreatedAtRoute("GetMovie", new {id = movie.Id},_response);
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string>() { ex.ToString() };
+        }
+
+        return _response;
+        
     }
     
     [HttpDelete("{id:int}", Name = "DeleteMovie")]
