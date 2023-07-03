@@ -120,22 +120,37 @@ public class MovieAPIController : Controller
     }
     
     [HttpDelete("{id:int}", Name = "DeleteMovie")]
-    public async Task<ActionResult> DeleteMovie(int id)
+    public async Task<ActionResult<APIResponse>> DeleteMovie(int id)
     {
-        if (id == 0)
+        try
         {
-            return BadRequest();
+            if (id == 0)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest();
+            }
+
+            var movie = await _db.GetAsync(u => u.Id == id);
+            if (movie == null)
+            {
+                _response.StatusCode = HttpStatusCode.NotFound;
+                return NotFound();
+            }
+
+            await _db.RemoveAsync(movie);
+            
+            _response.StatusCode = HttpStatusCode.NoContent;
+            _response.IsSuccess = true;
+
+            return Ok(movie);
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string>() { ex.ToString() };
         }
         
-        var movie = await _db.GetAsync(u => u.Id == id);
-        if (movie == null)
-        {
-            return NotFound();
-        }
-
-        await _db.RemoveAsync(movie);
-
-        return Ok(movie);
+        return _response;
     }
 
     // [HttpPut("{id:int}", Name = "UpdateMovie")]
