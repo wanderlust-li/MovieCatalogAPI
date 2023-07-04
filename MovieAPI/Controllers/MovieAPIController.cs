@@ -153,17 +153,32 @@ public class MovieAPIController : Controller
         return _response;
     }
 
-    // [HttpPut("{id:int}", Name = "UpdateMovie")]
-    // public async Task<ActionResult> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateDTO)
-    // {
-    //     if (updateDTO == null || updateDTO.Id != id)
-    //     {
-    //         return BadRequest();
-    //     }
-    //
-    //     Movie movie = _mapper.Map<Movie>(updateDTO);
-    //     await _db.UpdateAsync(movie);
-    //
-    //     return Ok(movie);
-    // }
+    [HttpPut("{id:int}", Name = "UpdateMovie")]
+    public async Task<ActionResult<APIResponse>> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateMovieDTO)
+    {
+        try
+        {
+            if (updateMovieDTO == null || updateMovieDTO.Id != id)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest();
+            }
+
+            Movie movie = _mapper.Map<Movie>(updateMovieDTO);
+            await _db.UpdateAsync(movie);
+
+            _response.StatusCode = HttpStatusCode.Created;
+            _response.IsSuccess = true;
+
+            return Ok(movie);
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string>() { ex.ToString() };
+        }
+
+        return _response;
+    }
+    
 }
