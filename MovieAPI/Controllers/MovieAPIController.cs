@@ -24,6 +24,9 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<APIResponse>> GetMovie(int id)
     {
         try
@@ -56,6 +59,7 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<APIResponse>> GetMovies()
     {
         try
@@ -86,6 +90,10 @@ public class MovieAPIController : Controller
 
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
     public async Task<ActionResult<APIResponse>> CreateMovie([FromBody] CreateMovieDTO createDto)
     {
         try
@@ -120,6 +128,9 @@ public class MovieAPIController : Controller
     }
     
     [HttpDelete("{id:int}", Name = "DeleteMovie")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<APIResponse>> DeleteMovie(int id)
     {
         try
@@ -153,32 +164,34 @@ public class MovieAPIController : Controller
         return _response;
     }
 
-    [HttpPut("{id:int}", Name = "UpdateMovie")]
-    public async Task<ActionResult<APIResponse>> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateMovieDTO)
-    {
-        try
-        {
-            if (updateMovieDTO == null || updateMovieDTO.Id != id)
-            {
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                return BadRequest();
-            }
-
-            Movie movie = _mapper.Map<Movie>(updateMovieDTO);
-            await _db.UpdateAsync(movie);
-
-            _response.StatusCode = HttpStatusCode.Created;
-            _response.IsSuccess = true;
-
-            return Ok(movie);
-        }
-        catch (Exception ex)
-        {
-            _response.IsSuccess = false;
-            _response.ErrorMessages = new List<string>() { ex.ToString() };
-        }
-
-        return _response;
-    }
+    // [HttpPut("{id:int}", Name = "UpdateMovie")]
+    // [ProducesResponseType(StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // public async Task<ActionResult<APIResponse>> UpdateMovie(int id, [FromBody] UpdateMovieDTO updateMovieDTO)
+    // {
+    //     try
+    //     {
+    //         if (updateMovieDTO == null || updateMovieDTO.Id != id)
+    //         {
+    //             _response.StatusCode = HttpStatusCode.BadRequest;
+    //             return BadRequest();
+    //         }
+    //
+    //         Movie movie = _mapper.Map<Movie>(updateMovieDTO);
+    //         await _db.UpdateAsync(movie);
+    //
+    //         _response.StatusCode = HttpStatusCode.Created;
+    //         _response.IsSuccess = true;
+    //
+    //         return Ok(movie);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _response.IsSuccess = false;
+    //         _response.ErrorMessages = new List<string>() { ex.ToString() };
+    //     }
+    //
+    //     return _response;
+    // }
     
 }
