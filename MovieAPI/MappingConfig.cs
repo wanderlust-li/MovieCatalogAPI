@@ -10,7 +10,7 @@ public class MappingConfig : Profile
     {
         CreateMap<Movie, MovieDTO>();
         CreateMap<MovieDTO, Movie>();
-        
+
         CreateMap<Movie, CreateMovieDTO>().ReverseMap();
         CreateMap<Movie, UpdateMovieDTO>().ReverseMap();
     }

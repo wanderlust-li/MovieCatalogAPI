@@ -15,8 +15,7 @@ public class MovieDTO
 
     [StringLength(100, ErrorMessage = "The country must be at most 100 characters.")]
     public string Country { get; set; }
-
-    [Url(ErrorMessage = "The image URL is not valid.")]
+    
     public string ImageUrl { get; set; }
 
     [Required(ErrorMessage = "The genre is required.")]

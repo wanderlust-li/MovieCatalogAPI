@@ -76,3 +76,9 @@ D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\refint\MovieAPI.dll
 D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.pdb
 D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\MovieAPI.genruntimeconfig.cache
 D:\ApplicationFilms\MovieAPI\obj\Debug\net7.0\ref\MovieAPI.dll
+D:\ApplicationFilms\MovieAPI\bin\Debug\net7.0\System.Net.Http.Formatting.dll
+D:\ApplicationFilms\MovieAPI\bin\Debug\net7.0\System.Web.Http.dll
+D:\ApplicationFilms\MovieAPI\bin\Debug\net7.0\Microsoft.AspNet.WebApi.Versioning.dll
+D:\ApplicationFilms\MovieAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Mvc.Versioning.dll
+D:\ApplicationFilms\MovieAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.dll
+D:\ApplicationFilms\MovieAPI\bin\Debug\net7.0\Newtonsoft.Json.dll

@@ -6,10 +6,12 @@ using MovieAPI.Models;
 using MovieAPI.Models.DTO;
 using MovieAPI.Repository.IRepository;
 
-namespace MovieAPI.Controllers;
+namespace MovieAPI.Controllers.v1;
 
-[Route("api/Movie")]
+
+[Route("api/v{version:apiVersion}/Movie")]
 [ApiController]
+[ApiVersion("1.0")]
 public class MovieAPIController : Controller
 {
     protected APIResponse _response;
