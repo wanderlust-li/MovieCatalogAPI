@@ -4193,11 +4193,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\ApplicationFilms\\MovieAPI\\MovieAPI.csproj",
+      "projectUniqueName": "D:\\MovieCatalog\\MovieAPI\\MovieAPI.csproj",
       "projectName": "MovieAPI",
-      "projectPath": "D:\\ApplicationFilms\\MovieAPI\\MovieAPI.csproj",
+      "projectPath": "D:\\MovieCatalog\\MovieAPI\\MovieAPI.csproj",
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "D:\\ApplicationFilms\\MovieAPI\\obj\\",
+      "outputPath": "D:\\MovieCatalog\\MovieAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",

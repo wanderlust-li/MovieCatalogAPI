@@ -71,7 +71,7 @@ builder.Services.AddSwaggerGen(options =>
         Contact = new OpenApiContact
         {
             Name  = "Wanderlust",
-            Url = new Uri("https://wanderlust-li.github.io/wanderlust-li-cv/")
+            Url = new Uri("https://github.com/wanderlust-li")
         },
         License = new OpenApiLicense
         {
