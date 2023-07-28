@@ -4,7 +4,8 @@ namespace MovieAPI.Models.DTO;
 
 public class MovieDTO
 {
-
+    [Key]
+    public int Id { get; set; }
     [Required(ErrorMessage = "The movie title is required.")]
     [StringLength(100, ErrorMessage = "The movie title must be at most 100 characters.")]
     public string Title { get; set; }

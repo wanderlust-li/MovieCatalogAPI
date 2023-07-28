@@ -34,7 +34,6 @@ builder.Services.AddVersionedApiExplorer(options =>
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
-        
     options.AddDefaultPolicy(
         policy =>
         {
@@ -95,6 +94,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseCors(x => x.AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod());
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

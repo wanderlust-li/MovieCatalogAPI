@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using MovieAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using MovieAPI.Models;
@@ -14,7 +15,7 @@ namespace MovieAPI.Controllers.v1;
 [ApiVersion("1.0")]
 public class MovieAPIController : Controller
 {
-    protected APIResponse _response;
+    private readonly APIResponse _response;
     private readonly IMovieRepository _db;
     private readonly IMapper _mapper;
 
@@ -60,6 +61,7 @@ public class MovieAPIController : Controller
         return _response;
     }
 
+    // [Authorize]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<APIResponse>> GetMovies()
