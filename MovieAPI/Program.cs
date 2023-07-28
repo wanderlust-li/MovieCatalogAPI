@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using MovieAPI;
 using MovieAPI.Data;
 using MovieAPI.Repository;
@@ -31,11 +32,22 @@ builder.Services.AddVersionedApiExplorer(options =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+        
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    /*options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description =
             "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
@@ -61,7 +73,7 @@ builder.Services.AddSwaggerGen(options =>
             },
             new List<string>()
         }
-    });
+    });*/
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1.0",
@@ -86,14 +98,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
-app.UseAuthorization();
+// app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
