@@ -1,5 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import '../style/Main.css'
 
 const Main = () => {
     const [movies, setMovies] = useState([]);
@@ -17,23 +19,23 @@ const Main = () => {
     }, []);
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="movies-grid">
             {movies.map(movie => (
-                <div key={movie.id} className="bg-white rounded-lg shadow-md p-4">
+                <Link to={`/movie/${movie.id}`} key={movie.id} className="movie-card">
                     <img
-                        className="w-full h-40 object-cover rounded-t-lg"
+                        className="movie-image"
                         src={movie.imageUrl}
                         alt={movie.title}
                     />
-                    <div className="p-4">
-                        <h2 className="text-lg font-bold mb-2">{movie.title}</h2>
-                        <p className="text-gray-700 text-sm h-20 overflow-hidden">{movie.description}</p>
-                        <div className="flex items-center mt-4">
-                            <span className="mr-2">Rating:</span>
-                            <span>{movie.rating}</span>
+                    <div className="movie-details">
+                        <h2 className="movie-title">{movie.title}</h2>
+                        <p className="movie-description">{movie.description}</p>
+                        <div className="movie-rating">
+                            <span className="rating-label">Rating:</span>
+                            <span className="rating-value">{movie.rating}</span>
                         </div>
                     </div>
-                </div>
+                </Link>
             ))}
         </div>
     );
