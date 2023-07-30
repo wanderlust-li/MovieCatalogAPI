@@ -1,5 +1,9 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using MovieAPI.Data;
 using MovieAPI.Models;
 using MovieAPI.Models.DTO;
@@ -36,12 +40,49 @@ public class UserRepository : IUserRepository
         return false;
     }
 
-    public Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDto)
+    public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDto)
     {
-        throw new NotImplementedException();
+        var user = _db.ApplicationUsers
+            .FirstOrDefault(u => u.UserName.ToLower() == loginRequestDto.UserName.ToLower());
+
+        bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+
+        if (user == null || isValid == false)
+        {
+            return new LoginResponseDTO()
+            {
+                Token = "",
+                User = null
+            };
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(secretKey);
+        
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, user.UserName.ToString()),
+                new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+            }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        LoginResponseDTO loginResponseDto = new LoginResponseDTO()
+        {
+            Token = tokenHandler.WriteToken(token),
+            User = _mapper.Map<UserDTO>(user),
+            // Role = roles.FirstOrDefault()
+        };
+
+        return loginResponseDto;
     }
 
-    public Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO)
+    public async Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO)
     {
         throw new NotImplementedException();
     }
