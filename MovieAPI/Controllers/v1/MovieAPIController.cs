@@ -61,7 +61,7 @@ public class MovieAPIController : Controller
         return _response;
     }
 
-    // [Authorize]
+    [Authorize]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<APIResponse>> GetMovies()
