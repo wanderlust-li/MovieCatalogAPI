@@ -84,6 +84,36 @@ public class UserRepository : IUserRepository
 
     public async Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO)
     {
-        throw new NotImplementedException();
+        ApplicationUser user = new ApplicationUser()
+        {
+            UserName = registerationRequestDTO.UserName,
+            Email = registerationRequestDTO.UserName,
+            NormalizedEmail = registerationRequestDTO.UserName.ToUpper(),
+            Name = registerationRequestDTO.Name
+            // Role = registerationRequestDTO.Role
+        };
+
+        try
+        {
+            var result = await _userManager.CreateAsync(user, registerationRequestDTO.Password);
+            if (result.Succeeded)
+            {
+                if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("admin"));
+                    await _roleManager.CreateAsync(new IdentityRole("customer"));
+                }
+                await _userManager.AddToRoleAsync(user, "admin");
+                var userToReturn = _db.ApplicationUsers
+                    .FirstOrDefault(u => u.UserName == registerationRequestDTO.UserName);
+                return _mapper.Map<UserDTO>(userToReturn);
+            }
+        } 
+        catch (Exception ex)
+        {
+            
+        }
+
+        return new UserDTO();
     }
 }
