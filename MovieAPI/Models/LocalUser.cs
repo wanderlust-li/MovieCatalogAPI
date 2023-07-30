@@ -1,6 +1,6 @@
 ﻿namespace MovieAPI.Models;
 
-public class LocalUser
+public class LocalUser 
 {
     public int Id { get; set; }
     
