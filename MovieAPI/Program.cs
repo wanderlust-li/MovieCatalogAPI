@@ -22,6 +22,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddResponseCaching();
 
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 // Add services to the container.
 
