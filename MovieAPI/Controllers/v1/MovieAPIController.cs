@@ -37,6 +37,7 @@ public class MovieAPIController : Controller
             if (id == 0)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
                 return BadRequest(_response);
             }
 
@@ -44,6 +45,7 @@ public class MovieAPIController : Controller
             if (film == null)
             {
                 _response.StatusCode = HttpStatusCode.NotFound;
+                _response.IsSuccess = false;
                 return NotFound(_response);
             }
 
@@ -61,7 +63,7 @@ public class MovieAPIController : Controller
         return _response;
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<APIResponse>> GetMovies()
@@ -73,6 +75,7 @@ public class MovieAPIController : Controller
             if (films == null)
             {
                 _response.StatusCode = HttpStatusCode.NotFound;
+                _response.IsSuccess = false;
                 return NotFound(_response);
             }
             
@@ -92,7 +95,7 @@ public class MovieAPIController : Controller
         
     }
 
-    [Authorize]
+    // [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -104,11 +107,13 @@ public class MovieAPIController : Controller
         {
             if (createDto == null)
             {
+                _response.IsSuccess = false;
                 return BadRequest(createDto);
             }
 
             if (await _db.GetAsync(u => u.Title.ToLower() == createDto.Title.ToLower()) != null)
             {
+                _response.IsSuccess = false;
                 ModelState.AddModelError("ErrorMessages", "Film already exists!");
 
                 return BadRequest(ModelState);
@@ -142,6 +147,7 @@ public class MovieAPIController : Controller
             if (id == 0)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
                 return BadRequest();
             }
 
@@ -149,6 +155,7 @@ public class MovieAPIController : Controller
             if (movie == null)
             {
                 _response.StatusCode = HttpStatusCode.NotFound;
+                _response.IsSuccess = false;
                 return NotFound();
             }
 
