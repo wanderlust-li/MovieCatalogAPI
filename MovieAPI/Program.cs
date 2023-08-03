@@ -16,22 +16,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddResponseCaching();
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddResponseCaching();
 
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 // Add services to the container.
 
-builder.Services.AddApiVersioning(options =>
-{
+builder.Services.AddApiVersioning(options => {
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.ReportApiVersions = true;
 });
+
 builder.Services.AddVersionedApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
@@ -52,12 +53,7 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddApiVersioning(options =>
-{
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.ReportApiVersions = true;
-});
+
 builder.Services.AddVersionedApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
@@ -65,6 +61,7 @@ builder.Services.AddVersionedApiExplorer(options =>
 });
 
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
+
 builder.Services.AddAuthentication(x =>
     {
         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -156,9 +153,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
-// app.UseAuthorization();
+app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
