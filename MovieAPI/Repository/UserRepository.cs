@@ -104,10 +104,12 @@ public class UserRepository : IUserRepository
                 await _userManager.AddToRoleAsync(user, "admin");
                 var userToReturn = _db.ApplicationUsers
                     .FirstOrDefault(u => u.UserName == registerationRequestDTO.UserName);
-                if (userToReturn != null)
-                {
-                    return _mapper.Map<UserDTO>(userToReturn);
-                }
+                
+                return _mapper.Map<UserDTO>(userToReturn);
+                // if (userToReturn != null)
+                // {
+                //     return _mapper.Map<UserDTO>(userToReturn);
+                // }
             }
         }
         catch(Exception e)
