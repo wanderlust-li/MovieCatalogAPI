@@ -8,6 +8,9 @@ using MovieAPI.Data;
 using MovieAPI.Models;
 using MovieAPI.Models.DTO;
 using MovieAPI.Repository.IRepository;
+using Microsoft.Extensions.Logging;
+
+
 
 namespace MovieAPI.Repository;
 
@@ -18,16 +21,19 @@ public class UserRepository : IUserRepository
     private readonly RoleManager<IdentityRole> _roleManager;
     private string secretKey;
     private readonly IMapper _mapper;
+    private readonly ILogger<UserRepository> _logger;
+
 
     public UserRepository(ApplicationDbContext db, IConfiguration configuration,
         UserManager<ApplicationUser> userManager, IMapper mapper,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager, ILogger<UserRepository> logger)
     {
         _db = db;
         _userManager = userManager;
         _mapper = mapper;
         secretKey = configuration.GetValue<string>("ApiSettings:Secret");
         _roleManager = roleManager;
+        _logger = logger;
     }
 
 
@@ -59,7 +65,7 @@ public class UserRepository : IUserRepository
         var roles = await _userManager.GetRolesAsync(user);
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(secretKey);
-        
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new Claim[]
@@ -70,7 +76,7 @@ public class UserRepository : IUserRepository
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
-        
+
         var token = tokenHandler.CreateToken(tokenDescriptor);
         LoginResponseDTO loginResponseDto = new LoginResponseDTO()
         {
@@ -87,8 +93,8 @@ public class UserRepository : IUserRepository
         ApplicationUser user = new()
         {
             UserName = registerationRequestDTO.UserName,
-            Email=registerationRequestDTO.UserName,
-            NormalizedEmail=registerationRequestDTO.UserName.ToUpper(),
+            Email = registerationRequestDTO.UserName,
+            NormalizedEmail = registerationRequestDTO.UserName.ToUpper(),
             Name = registerationRequestDTO.Name
         };
 
@@ -97,26 +103,37 @@ public class UserRepository : IUserRepository
             var result = await _userManager.CreateAsync(user, registerationRequestDTO.Password);
             if (result.Succeeded)
             {
-                if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult()){
+                if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                {
+                    Console.WriteLine("Dgfsdg");
                     await _roleManager.CreateAsync(new IdentityRole("admin"));
                     await _roleManager.CreateAsync(new IdentityRole("customer"));
                 }
+
                 await _userManager.AddToRoleAsync(user, "admin");
                 var userToReturn = _db.ApplicationUsers
                     .FirstOrDefault(u => u.UserName == registerationRequestDTO.UserName);
-                
-                return _mapper.Map<UserDTO>(userToReturn);
-                // if (userToReturn != null)
-                // {
-                //     return _mapper.Map<UserDTO>(userToReturn);
-                // }
+
+                // return _mapper.Map<UserDTO>(userToReturn);
+                if (userToReturn != null)
+                {
+                    return _mapper.Map<UserDTO>(userToReturn);
+                }
+            }
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.LogError($"Error during registration: {error.Code} - {error.Description}");
+                }
             }
         }
-        catch(Exception e)
+        catch (Exception ex)
         {
-
+            _logger.LogError(ex, "Error during registration");
+            throw;
         }
-
+        
         return new UserDTO();
     }
 }
