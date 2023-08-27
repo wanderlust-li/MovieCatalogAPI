@@ -21,4 +21,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<LocalUser> LocalUsers { get; set; }
     
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    
+    public DbSet<Actor> Actors { get; set; }
 }
