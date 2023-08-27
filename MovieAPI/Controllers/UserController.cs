@@ -9,21 +9,24 @@ namespace MovieAPI.Controllers;
 [Route("api/v{version:apiVersion}/UsersAuth")]
 [ApiController]
 [ApiVersionNeutral]
-
 public class UserController : Controller
 {
     private readonly IUserRepository _userRepository;
     protected APIResponse _response;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(IUserRepository userRepository)
+    public UserController(IUserRepository userRepository, ILogger<UserController> logger)
     {
         _userRepository = userRepository;
         this._response = new();
+        _logger = logger;
     }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
     {
         var loginRepsonse = await _userRepository.Login(model);
+
         if (loginRepsonse.User == null || string.IsNullOrEmpty(loginRepsonse.Token))
         {
             _response.StatusCode = HttpStatusCode.BadRequest;
@@ -38,7 +41,7 @@ public class UserController : Controller
 
         return Ok(_response);
     }
-    
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterationRequestDTO model)
     {
@@ -59,9 +62,9 @@ public class UserController : Controller
             _response.ErrorMessages.Add("Error while registering");
             return BadRequest(_response);
         }
+
         _response.StatusCode = HttpStatusCode.OK;
         _response.IsSuccess = true;
         return Ok(_response);
     }
-    
 }

@@ -1,0 +1,12 @@
+D:\MovieCatalog\Movie_Utility\bin\Debug\net7.0\Movie_Utility.deps.json
+D:\MovieCatalog\Movie_Utility\bin\Debug\net7.0\Movie_Utility.dll
+D:\MovieCatalog\Movie_Utility\bin\Debug\net7.0\Movie_Utility.pdb
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.csproj.AssemblyReference.cache
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.GeneratedMSBuildEditorConfig.editorconfig
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.AssemblyInfoInputs.cache
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.AssemblyInfo.cs
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.csproj.CoreCompileInputs.cache
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.dll
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\refint\Movie_Utility.dll
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\Movie_Utility.pdb
+D:\MovieCatalog\Movie_Utility\obj\Debug\net7.0\ref\Movie_Utility.dll

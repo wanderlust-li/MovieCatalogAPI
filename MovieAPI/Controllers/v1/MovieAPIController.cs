@@ -27,6 +27,7 @@ public class MovieAPIController : Controller
     }
 
     [HttpGet("{id:int}", Name = "GetMovie")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -11,7 +11,6 @@ using MovieAPI.Repository.IRepository;
 using Microsoft.Extensions.Logging;
 
 
-
 namespace MovieAPI.Repository;
 
 public class UserRepository : IUserRepository
@@ -50,10 +49,19 @@ public class UserRepository : IUserRepository
     {
         var user = _db.ApplicationUsers
             .FirstOrDefault(u => u.UserName.ToLower() == loginRequestDto.UserName.ToLower());
+        
+        if (user == null)
+        {
+            return new LoginResponseDTO()
+            {
+                Token = "",
+                User = null
+            };
+        }
 
         bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-
-        if (user == null || isValid == false)
+        
+        if (isValid == false)
         {
             return new LoginResponseDTO()
             {
@@ -105,7 +113,6 @@ public class UserRepository : IUserRepository
             {
                 if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
                 {
-                    Console.WriteLine("Dgfsdg");
                     await _roleManager.CreateAsync(new IdentityRole("admin"));
                     await _roleManager.CreateAsync(new IdentityRole("customer"));
                 }
@@ -120,6 +127,7 @@ public class UserRepository : IUserRepository
                     return _mapper.Map<UserDTO>(userToReturn);
                 }
             }
+
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -133,7 +141,7 @@ public class UserRepository : IUserRepository
             _logger.LogError(ex, "Error during registration");
             throw;
         }
-        
+
         return new UserDTO();
     }
 }
