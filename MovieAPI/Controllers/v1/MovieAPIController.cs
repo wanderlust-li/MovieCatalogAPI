@@ -123,7 +123,7 @@ public class MovieAPIController : Controller
             Movie movie = _mapper.Map<Movie>(createDto);
             await _db.CreateAsync(movie);
 
-            _response.Result = _mapper.Map<List<MovieDTO>>(movie);
+            _response.Result = _mapper.Map<MovieDTO>(movie);
             _response.StatusCode = HttpStatusCode.Created;
             return CreatedAtRoute("GetMovie", new {id = movie.Id},_response);
         }
