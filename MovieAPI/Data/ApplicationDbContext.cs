@@ -23,4 +23,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     
     public DbSet<Actor> Actors { get; set; }
+    
+    public DbSet<MovieActor> MovieActors { get; set; }
 }
