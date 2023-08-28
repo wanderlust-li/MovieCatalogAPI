@@ -19,6 +19,11 @@ public class MappingConfig : Profile
         CreateMap<ActorDTO, Actor>();
         
         CreateMap<ActorCreateDTO, Actor>();
+        
+        CreateMap<MovieActor, MovieActorDTO>();
+        CreateMap<MovieActorDTO, MovieActor>();
+        
+        CreateMap<CreateMovieActorDTO, MovieActor>();
 
         CreateMap<ApplicationUser, UserDTO>().ReverseMap();
     }
