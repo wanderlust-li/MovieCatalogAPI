@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using MovieAPI.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using MovieAPI.Models;
 using MovieAPI.Models.DTO;
 using MovieAPI.Repository.IRepository;
@@ -18,11 +19,14 @@ public class MovieAPIController : Controller
     private readonly APIResponse _response;
     private readonly IMovieRepository _db;
     private readonly IMapper _mapper;
+    private readonly IMemoryCache _cache;
 
-    public MovieAPIController(IMovieRepository db, IMapper mapper)
+
+    public MovieAPIController(IMovieRepository db, IMapper mapper, IMemoryCache cache)
     {
         _db = db;
         _mapper = mapper;
+        _cache = cache;
         this._response = new();
     }
 
@@ -41,16 +45,27 @@ public class MovieAPIController : Controller
                 _response.IsSuccess = false;
                 return BadRequest(_response);
             }
-
-            var film = await _db.GetAsync(u => u.Id == id);
-            if (film == null)
+            
+            if (!_cache.TryGetValue($"Movie-{id}", out MovieDTO cachedMovie))
             {
-                _response.StatusCode = HttpStatusCode.NotFound;
-                _response.IsSuccess = false;
-                return NotFound(_response);
+                var film = await _db.GetAsync(u => u.Id == id);
+                if (film == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    _response.IsSuccess = false;
+                    return NotFound(_response);
+                }
+                cachedMovie = _mapper.Map<MovieDTO>(film);
+                
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60)
+                };
+
+                _cache.Set($"Movie-{id}", cachedMovie, cacheEntryOptions);
             }
 
-            _response.Result = _mapper.Map<MovieDTO>(film);
+            _response.Result = cachedMovie;
             _response.StatusCode = HttpStatusCode.OK;
 
             return Ok(_response);
