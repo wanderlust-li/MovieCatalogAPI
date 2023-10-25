@@ -13,5 +13,5 @@ public class User
     // Is it possible to use a specific data type for geolocation instead of a string?
     public string Location { get; set; } 
     
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

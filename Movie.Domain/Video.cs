@@ -1,10 +1,14 @@
-﻿namespace Movie.Domain;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Movie.Domain;
 
 public class Video
 {
     public Guid Id { get; set; }
     
+    [ForeignKey("User")]
     public Guid UserId { get; set; }
+    public User User { get; set; }  
     
     public string Title { get; set; }
     
@@ -14,7 +18,7 @@ public class Video
     
     public string StreamURL { get; set; }
     
-    public Guid? Tags { get; set; } 
+    public ICollection<Tag> Tags { get; set; }
     
     public DateTime UploadedAt { get; set; }
 }
