@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Movie.Domain.Common;
 
 namespace Movie.Domain;
 
-public class View
+public class View : BaseEntity
 {
-    public Guid Id { get; set; }
-    
     [ForeignKey("User")]
     public Guid UserId { get; set; }
     public User User { get; set; }  
@@ -16,7 +15,5 @@ public class View
     
     public int Offset { get; set; }
     
-    public string Platform { get; set; } 
-    
-    public DateTime CreatedAt { get; set; }
+    public string Platform { get; set; }
 }

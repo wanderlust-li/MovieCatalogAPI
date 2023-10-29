@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Movie.Domain.Common;
 
 namespace Movie.Domain;
 
-public class Video
+public class Video : BaseEntity
 {
-    public Guid Id { get; set; }
-    
     [ForeignKey("User")]
     public Guid UserId { get; set; }
     public User User { get; set; }  
@@ -20,5 +19,4 @@ public class Video
     
     public ICollection<Tag> Tags { get; set; }
     
-    public DateTime UploadedAt { get; set; }
 }

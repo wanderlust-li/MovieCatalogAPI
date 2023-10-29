@@ -1,9 +1,9 @@
-﻿namespace Movie.Domain;
+﻿using Movie.Domain.Common;
 
-public class User
+namespace Movie.Domain;
+
+public class User : BaseEntity
 {
-    public Guid Id { get; set; }
-    
     public string Name { get; set; }
     
     public string Email { get; set; }
@@ -13,5 +13,4 @@ public class User
     // Is it possible to use a specific data type for geolocation instead of a string?
     public string Location { get; set; } 
     
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
