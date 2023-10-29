@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieAPI", "MovieAPI\MovieAPI.csproj", "{801DD4A5-BE41-4892-A6D4-5AEA90D35340}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movie_Utility", "Movie_Utility\Movie_Utility.csproj", "{BB52D742-043F-4B73-961D-00266683FAF4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movie.Domain", "Movie.Domain\Movie.Domain.csproj", "{D4541BAC-7FDB-4ED0-A4BC-B216B1A4D9C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Movie.Infrastructure", "Movie.Infrastructure\Movie.Infrastructure.csproj", "{C1BC018E-214C-4983-8889-938B18D9A29F}"
@@ -20,10 +18,6 @@ Global
 		{801DD4A5-BE41-4892-A6D4-5AEA90D35340}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{801DD4A5-BE41-4892-A6D4-5AEA90D35340}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{801DD4A5-BE41-4892-A6D4-5AEA90D35340}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB52D742-043F-4B73-961D-00266683FAF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB52D742-043F-4B73-961D-00266683FAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB52D742-043F-4B73-961D-00266683FAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB52D742-043F-4B73-961D-00266683FAF4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D4541BAC-7FDB-4ED0-A4BC-B216B1A4D9C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D4541BAC-7FDB-4ED0-A4BC-B216B1A4D9C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4541BAC-7FDB-4ED0-A4BC-B216B1A4D9C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
